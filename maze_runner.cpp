@@ -43,7 +43,7 @@ void generateMaze(Cell **&maze, int rows, int cols);
 void printMaze(Cell **maze, int rows, int cols, int playerRow, int playerCol);
 bool isValid(int row, int col, int rows, int cols);
 void movePlayer(Cell **&maze, int &playerRow, int &playerCol, int rows, int cols);
-void dijkstraShortestPath(Cell **&maze, int playerRow, int playerCol, int rows, int cols);
+void algo(Cell **maze, int playerRow, int playerCol, int rows, int cols);
 int calculateDistance(int startX, int startY, int targetX, int targetY);
 void freeMaze(Cell **maze, int rows);
 
@@ -71,7 +71,7 @@ int main()
     {
     case 1:
         rows = cols = 5;
-        timeLimit = 10;
+        // timeLimit = 10;
         break;
     case 2:
         rows = cols = 10;
@@ -107,10 +107,10 @@ int main()
         // Print maze and player position
         printMaze(maze, rows, cols, playerRow, playerCol);
 
-        for (const auto &pair : shortestPath)
-        {
-            cout << "Coordinate: (" << pair.first.first << ", " << pair.first.second << "), Value: " << pair.second << endl;
-        }
+        // for (const auto &pair : shortestPath)
+        // {
+        //     cout << "Coordinate: (" << pair.first.first << ", " << pair.first.second << "), Value: " << pair.second << endl;
+        // }
 
         // Print the remaining time
         auto currentTime = high_resolution_clock::now();
@@ -120,48 +120,49 @@ int main()
         // Move player
         movePlayer(maze, playerRow, playerCol, rows, cols);
 
-        // dijkstraShortestPath(maze, playerRow, playerCol, rows, cols);
+        algo(maze, playerRow, playerCol, rows, cols);
 
-        // Checks for game over conditions (reached exit, hit obstacle, etc.)
+        // Checks for game over conditions (reached exit, hit obstacle, etc.).
         if (playerRow == rows - 1 && playerCol == cols - 1)
         {
             cout << YELLOW << "Congratulations! You reached the exit!" << RESET << endl;
             cout << "You have taken\t" << calculateDistance(0, 0, playerRow, playerCol) << "steps to reach the exit." << endl;
             gameOver = true;
-            // Free allocated memory
+            // Free allocated memory.
             freeMaze(maze, rows);
         }
 
-        // Check if time is up
+        // Check if time is up.
         if (duration.count() >= timeLimit)
         {
             cout << BLACK << "Time's up! You failed to complete the maze within the time limit." << RESET << endl;
             cout << "You have taken\t" << calculateDistance(0, 0, playerRow, playerCol) << "steps." << endl;
             gameOver = true;
-            // Free allocated memory
+            // Free allocated memory.
             freeMaze(maze, rows);
         }
     }
 
+    freeMaze(maze, rows);
     return 0;
 }
 
-// Generates maze using Depth-First Search algorithm
+// Generates maze using Depth-First Search algorithm.
 void generateMaze(Cell **&maze, int rows, int cols)
 {
-    maze = new Cell *[rows]; // Allocate memory for rows
+    maze = new Cell *[rows]; // Allocate memory for rows.
 
     for (int i = 0; i < rows; ++i)
     {
-        maze[i] = new Cell[cols]; // Allocate memory for each column
+        maze[i] = new Cell[cols]; // Allocate memory for each column.
         for (int j = 0; j < cols; ++j)
         {
             maze[i][j].row = i;
             maze[i][j].col = j;
             maze[i][j].visited = false;
-            maze[i][j].obstacle = false; // Initializing all cells as non-obstacles
+            maze[i][j].obstacle = false; // Initializing all cells as non-obstacles.
 
-            // 25% chance of being an obstacle
+            // 25% chance of being an obstacle.
             maze[i][j].obstacle = rand() % 4 == 0;
             maze[i][j].distance = INT_MAX;
             maze[i][j].previous = nullptr;
@@ -169,10 +170,10 @@ void generateMaze(Cell **&maze, int rows, int cols)
     }
 }
 
-// Prints maze with player's position
+// Prints maze with player's position.
 void printMaze(Cell **maze, int rows, int cols, int playerRow, int playerCol)
 {
-    // Print maze grid with cell coordinates
+    // Print maze grid with cell coordinates.
     for (int i = 0; i < rows; ++i)
     {
         for (int j = 0; j < cols; ++j)
@@ -180,17 +181,17 @@ void printMaze(Cell **maze, int rows, int cols, int playerRow, int playerCol)
             if (i == playerRow && j == playerCol)
             {
                 shortestPath.insert({{i, j}, "P"});
-                cout << CYAN << "P " << RESET; // Player
+                cout << CYAN << "P " << RESET; // Player.
             }
             else if (i == 0 && j == 0)
             {
                 shortestPath.insert({{i, j}, "S"});
-                cout << "S "; // Start
+                cout << "S "; // Start.
             }
             else if (i == rows - 1 && j == cols - 1)
             {
                 shortestPath.insert({{i, j}, "E"});
-                cout << "E "; // Exit
+                cout << "E "; // Exit.
             }
             else if (maze[i][j].obstacle)
             {
@@ -199,25 +200,25 @@ void printMaze(Cell **maze, int rows, int cols, int playerRow, int playerCol)
                     continue;
                 }
                 shortestPath.insert({{i, j}, "#"});
-                cout << GREEN << "# " << RESET; // Obstacle
+                cout << GREEN << "# " << RESET; // Obstacle.
             }
             else
             {
                 shortestPath.insert({{i, j}, "."});
-                cout << BLACK << ". " << RESET; // Path
+                cout << BLACK << ". " << RESET; // Path.
             }
         }
         cout << endl;
     }
 }
 
-// Checks if cell coordinates are within bounds
+// Checks if cell coordinates are within bounds.
 bool isValid(int row, int col, int rows, int cols)
 {
     return row >= 0 && row < rows && col >= 0 && col < cols;
 }
 
-// Free allocated memory for the maze
+// Free allocated memory for the maze.
 void freeMaze(Cell **maze, int rows)
 {
     for (int i = 0; i < rows; ++i)
@@ -228,7 +229,7 @@ void freeMaze(Cell **maze, int rows)
     cout << "deleted the maze successfully" << endl;
 }
 
-// Moves player based on user input
+// Moves player based on user input.
 void movePlayer(Cell **&maze, int &playerRow, int &playerCol, int rows, int cols)
 {
     char direction;
@@ -269,7 +270,7 @@ void movePlayer(Cell **&maze, int &playerRow, int &playerCol, int rows, int cols
     }
 }
 
-// Calculates distance between two points
+// Calculates distance between two points.
 int calculateDistance(int startX, int startY, int targetX, int targetY)
 {
     return abs(startX - targetX) + abs(startY - targetY);
@@ -277,91 +278,34 @@ int calculateDistance(int startX, int startY, int targetX, int targetY)
 
 void algo(Cell **maze, int playerRow, int playerCol, int rows, int cols)
 {
-    // Initialize a map to store the shortest path to each cell
-    map<pair<int, int>, int> shortestPath;
-
-    // Create a priority queue to store cells ordered by distance
-    priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> pq;
-
-    // Initialize distance to INT_MAX for all cells except the starting cell.
+    // Initialize distance of all cells to infinity and previous pointer to nullptr.
     for (int i = 0; i < rows; ++i)
     {
         for (int j = 0; j < cols; ++j)
         {
-            shortestPath[{i, j}] = INT_MAX;
+            maze[i][j].distance = INT_MAX;
+            maze[i][j].previous = nullptr;
         }
     }
-    shortestPath[{playerRow, playerCol}] = 0; // Distance to starting cell is 0
 
-    // Push the starting cell to the priority queue
-    pq.push({0, {playerRow, playerCol}});
-
-    // Dijkstra's algorithm
-    while (!pq.empty())
-    {
-        // Extract the cell with the smallest distance
-        pair<int, int> current = pq.top().second;
-        int row = current.first;
-        int col = current.second;
-        int distance = pq.top().first;
-        pq.pop();
-
-        // Explore neighbors of the current cell
-        int dx[] = {0, 0, 1, -1};
-        int dy[] = {1, -1, 0, 0};
-        for (int i = 0; i < 4; ++i)
-        {
-            int newRow = row + dx[i];
-            int newCol = col + dy[i];
-
-            // Check if the neighbor is within bounds
-            if (isValid(newRow, newCol, rows, cols))
-            {
-                // Calculate the distance to the neighbor
-                int newDistance = distance + 1;
-
-                // Check if the new distance is smaller than the current distance to the neighbor
-                if (newDistance < shortestPath[{newRow, newCol}] && !maze[newRow][newCol].obstacle)
-                {
-                    // Update the shortest distance to the neighbor and push it to the priority queue
-                    shortestPath[{newRow, newCol}] = newDistance;
-                    pq.push({newDistance, {newRow, newCol}});
-                }
-            }
-        }
-    }
-    /*
-    1. Take care of coordinates
-    2. Avoid the obstacles
-    3. track down short path : <1. Need to know the right number of step , which path takes the minimal path>
-                               <2. key : value , coordinates: stored value of "{ . , # , P , S , E}">
-                               <3. search for the right path uding this key value pairs.>
-                               <4. suggect the user the right path in a coordinate before exploring or give a option or hint to
-                               give them which path they should choose.>
-    */
-}
-
-/*
-void dijkstraShortestPath(Cell maze[][MAX_COLS], int playerRow, int playerCol, int rows, int cols)
-{
-    // Create a priority queue to store cells ordered by distance
+    // Create a priority queue to store cells ordered by distance.
     priority_queue<pair<int, Cell *>, vector<pair<int, Cell *>>, greater<pair<int, Cell *>>> pq;
-    maze[playerRow][playerCol].distance = 0;   // Start cell has distance 0
-    pq.push({0, &maze[playerRow][playerCol]}); // Push start cell to the priority queue
+    maze[playerRow][playerCol].distance = 0;   // Start cell has distance 0.
+    pq.push({0, &maze[playerRow][playerCol]}); // Push start cell to the priority queue.
 
-    // Dijkstra's algorithm
+    // Dijkstra's algorithm.
     while (!pq.empty())
     {
-        // Extract the cell with the smallest distance
+        // Extract the cell with the smallest distance.
         Cell *current = pq.top().second;
         pq.pop();
 
-        // Explore neighbors of the current cell
+        // Explore neighbors of the current cell.
         int row = current->row;
         int col = current->col;
         int distance = current->distance;
 
-        // Neighbor positions
+        // Neighbor positions.
         int dx[] = {0, 0, 1, -1};
         int dy[] = {1, -1, 0, 0};
 
@@ -370,46 +314,48 @@ void dijkstraShortestPath(Cell maze[][MAX_COLS], int playerRow, int playerCol, i
             int newRow = row + dx[i];
             int newCol = col + dy[i];
 
-            // Check if the neighbor is within bounds
-            if (isValid(newRow, newCol, rows, cols))
+            // Check if the neighbor is within bounds , so that memory does not go out of bound.
+            if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols)
             {
-                // Check if the neighbor is not an obstacle
+                // Check if the neighbor is not an obstacle.
                 if (!maze[newRow][newCol].obstacle)
                 {
-                    int newDistance = distance + 1; // Distance to neighbor is 1 more than current cell
+                    int newDistance = distance + 1; // Distance to neighbor is 1 more than current cell.
                     if (newDistance < maze[newRow][newCol].distance)
                     {
-                        // If the new distance is smaller, update the distance and previous cell
+                        // Update distance and previous pointer of the neighbor.
                         maze[newRow][newCol].distance = newDistance;
                         maze[newRow][newCol].previous = current;
-                        pq.push({newDistance, &maze[newRow][newCol]}); // Push neighbor to the priority queue
+                        // Push the neighbor to the priority queue with updated distance.
+                        pq.push({newDistance, &maze[newRow][newCol]});
                     }
                 }
             }
         }
     }
 
-    // After Dijkstra's algorithm is completed, suggest the next coordinates from the current position while avoiding obstacles
-    cout << "Suggested next coordinates:" << endl;
-    Cell *current = &maze[playerRow][playerCol]; // Start from current player position
-    if (current->previous == nullptr)
+    // Once Dijkstra's algorithm is done, backtrack from the exit to the start to find the shortest path.
+    Cell *current = &maze[rows - 1][cols - 1]; // Start from the exit.
+    vector<pair<int, int>> shortestPath;       // Store the shortest path coordinates.
+
+    while (current != nullptr)
     {
-        cout << "No valid path found." << endl;
-        return;
+        shortestPath.push_back({current->row, current->col});
+        current = current->previous; // Move to the previous cell in the shortest path.
     }
-    Cell *next = current->previous; // Get the next cell in the shortest path
-    while (next != nullptr && next->obstacle)
+
+    // Print the shortest path coordinates (in reverse order).
+    cout << "Shortest Path: ";
+    for (int i = shortestPath.size() - 1; i >= 0; --i)
     {
-        // If the next cell is an obstacle, move to its previous cell until a non-obstacle cell is found
-        next = next->previous;
+        cout << "(" << shortestPath[i].first << ", " << shortestPath[i].second << ") ";
     }
-    if (next == nullptr)
+    cout << endl;
+
+    // Suggest the next coordinates to the player based on the shortest path.
+    if (!shortestPath.empty())
     {
-        cout << "No valid path found." << endl;
-    }
-    else
-    {
-        cout << "Next coordinates: (" << next->row << ", " << next->col << ")" << endl;
+        pair<int, int> nextCoordinates = shortestPath[shortestPath.size() - 2]; // Get the second last coordinate.
+        cout << "Next Coordinates: (" << nextCoordinates.first << ", " << nextCoordinates.second << ")" << endl;
     }
 }
-*/
