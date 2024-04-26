@@ -43,7 +43,7 @@ void generateMaze(Cell **&maze, int rows, int cols);
 void printMaze(Cell **maze, int rows, int cols, int playerRow, int playerCol);
 bool isValid(int row, int col, int rows, int cols);
 void movePlayer(Cell **&maze, int &playerRow, int &playerCol, int rows, int cols);
-void algo(Cell **maze, int playerRow, int playerCol, int rows, int cols);
+void disktraAlgo(Cell **maze, int playerRow, int playerCol, int rows, int cols);
 int calculateDistance(int startX, int startY, int targetX, int targetY);
 void freeMaze(Cell **maze, int rows);
 
@@ -61,6 +61,7 @@ int main()
     cout << YELLOW << "1. Level 1: 5 * 5 maze" << RESET << endl;
     cout << BLUE << "2. Level 2: 10 * 10  maze" << RESET << endl;
     cout << RED << "3. Level 3: 20 * 20 maze" << RESET << endl;
+    cout << RED << "4. Level 3: 50 * 50 maze" << RESET << endl;
     cout << "Q : Quit" << endl;
     cin >> level;
 
@@ -71,7 +72,7 @@ int main()
     {
     case 1:
         rows = cols = 5;
-        // timeLimit = 10;
+        timeLimit = 10;
         break;
     case 2:
         rows = cols = 10;
@@ -79,6 +80,10 @@ int main()
         break;
     case 3:
         rows = cols = 20;
+        timeLimit = 40;
+        break;
+    case 4:
+        rows = cols = 50;
         timeLimit = 40;
         break;
     case 'Q':
@@ -107,11 +112,6 @@ int main()
         // Print maze and player position
         printMaze(maze, rows, cols, playerRow, playerCol);
 
-        // for (const auto &pair : shortestPath)
-        // {
-        //     cout << "Coordinate: (" << pair.first.first << ", " << pair.first.second << "), Value: " << pair.second << endl;
-        // }
-
         // Print the remaining time
         auto currentTime = high_resolution_clock::now();
         auto duration = duration_cast<seconds>(currentTime - startTime);
@@ -120,7 +120,7 @@ int main()
         // Move player
         movePlayer(maze, playerRow, playerCol, rows, cols);
 
-        algo(maze, playerRow, playerCol, rows, cols);
+        disktraAlgo(maze, playerRow, playerCol, rows, cols);
 
         // Checks for game over conditions (reached exit, hit obstacle, etc.).
         if (playerRow == rows - 1 && playerCol == cols - 1)
@@ -166,6 +166,12 @@ void generateMaze(Cell **&maze, int rows, int cols)
             maze[i][j].obstacle = rand() % 4 == 0;
             maze[i][j].distance = INT_MAX;
             maze[i][j].previous = nullptr;
+
+            // Mark cells that are not obstacles as paths
+            if (!maze[i][j].obstacle)
+            {
+                shortestPath.insert({{i, j}, "."});
+            }
         }
     }
 }
@@ -276,7 +282,7 @@ int calculateDistance(int startX, int startY, int targetX, int targetY)
     return abs(startX - targetX) + abs(startY - targetY);
 }
 
-void algo(Cell **maze, int playerRow, int playerCol, int rows, int cols)
+void disktraAlgo(Cell **maze, int playerRow, int playerCol, int rows, int cols)
 {
     // Initialize distance of all cells to infinity and previous pointer to nullptr.
     for (int i = 0; i < rows; ++i)
@@ -345,12 +351,12 @@ void algo(Cell **maze, int playerRow, int playerCol, int rows, int cols)
     }
 
     // Print the shortest path coordinates (in reverse order).
-    cout << "Shortest Path: ";
-    for (int i = shortestPath.size() - 1; i >= 0; --i)
-    {
-        cout << "(" << shortestPath[i].first << ", " << shortestPath[i].second << ") ";
-    }
-    cout << endl;
+    // cout << "Shortest Path: ";
+    // for (int i = shortestPath.size() - 1; i >= 0; --i)
+    // {
+    //     cout << "(" << shortestPath[i].first << ", " << shortestPath[i].second << ") ";
+    // }
+    // cout << endl;
 
     // Suggest the next coordinates to the player based on the shortest path.
     if (!shortestPath.empty())
