@@ -20,6 +20,8 @@ g++ maze_runner.cpp -o maze_runner
 
 5. Choose a level by entering the corresponding number (1, 2, 3, or 4) or 'Q' to quit.
 6. Use the W, A, S, and D keys to navigate the player through the maze.
+
+NOTE: Redirect to the master branch from the main branch to look for files and screenshots.
    
 Features
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
